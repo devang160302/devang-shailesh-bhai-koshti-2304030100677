@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Simple Banking System</title>
+    <style>
+        /* Basic CSS for better readability */
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        #balanceDisplay {
+            font-size: 2em;
+            font-weight: bold;
+            color: #28a745;
+            /* Green for money */
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .transaction-section {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        
+        input[type="number"] {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 150px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .deposit-btn {
+            background-color: #007bff;
+        }
+        /* Blue */
+        
+        .withdraw-btn {
+            background-color: #dc3545;
+        }
+        /* Red */
+        
+        #message {
+            margin-top: 15px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Simple Account Validator</h2>
+
+        <p>Current Balance:</p>
+        <div id="balanceDisplay">$100.00</div>
+        <hr>
+
+        <div class="transaction-section">
+            <h3>Deposit</h3>
+            <input type="number" id="depositAmount" placeholder="Enter amount" min="0">
+            <button class="deposit-btn" onclick="handleTransaction('deposit')">Deposit</button>
+        </div>
+
+        <div class="transaction-section">
+            <h3>Withdrawal</h3>
+            <input type="number" id="withdrawalAmount" placeholder="Enter amount" min="0">
+            <button class="withdraw-btn" onclick="handleTransaction('withdraw')">Withdraw</button>
+        </div>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // --- 1. Initial State and Variables ---
+        let balance = 100.00; // Starting balance
+
+        // DOM elements
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const depositInput = document.getElementById('depositAmount');
+        const withdrawalInput = document.getElementById('withdrawalAmount');
+        const messageElement = document.getElementById('message');
+
+        // --- 2. Update Display Function ---
+        // A reusable function to update the balance shown on the screen
+        function updateDisplay() {
+            // Format the balance to always show two decimal places
+            balanceDisplay.textContent = `$${balance.toFixed(2)}`;
+        }
+
+        // Initialize display with the starting balance
+        updateDisplay();
+
+        // --- 3. Core Transaction Logic (The Validator) ---
+        function handleTransaction(type) {
+            // Determine which input field to use based on the transaction type
+            const inputElement = (type === 'deposit') ? depositInput : withdrawalInput;
+
+            // Convert the input value to a number. Use parseFloat for decimal support.
+            let amount = parseFloat(inputElement.value);
+
+            // --- VALIDATION STEP 1: Check for valid amount ---
+            if (isNaN(amount) || amount <= 0) {
+                showMessage("Please enter a valid, positive amount.", 'red');
+                return; // Stop the function if validation fails
+            }
+
+            // --- Deposit Logic ---
+            if (type === 'deposit') {
+                balance += amount;
+                showMessage(`✅ Successfully deposited $${amount.toFixed(2)}`, 'green');
+                inputElement.value = ''; // Clear the input field
+
+                // --- Withdrawal Logic (Includes Balance Validation) ---
+            } else if (type === 'withdraw') {
+
+                // --- VALIDATION STEP 2: Check for insufficient funds ---
+                if (amount > balance) {
+                    showMessage(`❌ Insufficient Funds! Cannot withdraw $${amount.toFixed(2)} (Current Balance: $${balance.toFixed(2)})`, 'red');
+                    return; // Stop the function if validation fails
+                }
+
+                // If validation passes, process the withdrawal
+                balance -= amount;
+                showMessage(`✅ Successfully withdrew $${amount.toFixed(2)}`, 'green');
+                inputElement.value = ''; // Clear the input field
+            }
+
+            // --- 4. Final Step: Update the Display ---
+            updateDisplay();
+        }
+
+        // --- 5. Message Handler Function ---
+        function showMessage(text, color) {
+            messageElement.textContent = text;
+            messageElement.style.backgroundColor = (color === 'green') ? '#d4edda' : '#f8d7da';
+            messageElement.style.color = (color === 'green') ? '#155724' : '#721c24';
+            messageElement.style.borderColor = (color === 'green') ? '#c3e6cb' : '#f5c6cb';
+        }
+    </script>
+
+</body>
+
+</html>
